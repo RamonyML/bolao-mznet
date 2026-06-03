@@ -1,0 +1,174 @@
+.admin-page {
+  background: #f4f7f5;
+  min-height: 100dvh;
+}
+
+.admin-topbar {
+  background: linear-gradient(135deg, #166635, #002776);
+}
+
+.admin-topbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-topbar__logo {
+  max-height: 36px;
+  width: auto;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.25));
+}
+
+.admin-topbar__badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #ffdf00;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+}
+
+.text-brasil-verde {
+  color: #166635 !important;
+}
+
+.admin-search {
+  max-width: 280px;
+  border-radius: 999px;
+}
+
+.admin-table thead th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+  font-weight: 600;
+  border-bottom-width: 1px;
+}
+
+.admin-table td {
+  font-size: 0.9rem;
+}
+
+.admin-table .placar-cell {
+  font-weight: 800;
+  color: #002776;
+  white-space: nowrap;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
+
+.admin-actions .btn {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.65rem;
+}
+
+.resultados-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.resultado-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.resultado-item__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.resultado-item__jogo {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.resultado-item__placar {
+  font-size: 0.8rem;
+  color: #166635;
+  font-weight: 800;
+}
+
+.admin-row--exact {
+  background: rgba(255, 223, 0, 0.12) !important;
+}
+
+.admin-row--hit {
+  background: rgba(22, 102, 53, 0.06) !important;
+}
+
+.admin-status {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.admin-status--exact {
+  background: #ffdf00;
+  color: #166635;
+}
+
+.admin-status--hit {
+  background: #166635;
+  color: #fff;
+}
+
+.admin-status--miss {
+  background: #f3f4f6;
+  color: #9ca3af;
+}
+
+.admin-status--late {
+  background: #dc2626;
+  color: #fff;
+}
+
+@media (max-width: 767px) {
+  .admin-table thead {
+    display: none;
+  }
+
+  .admin-table tbody tr {
+    display: block;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.75rem 0;
+  }
+
+  .admin-table tbody td {
+    display: block;
+    border: none;
+    padding: 0.15rem 0;
+  }
+
+  .admin-table tbody td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: #9ca3af;
+    display: block;
+    margin-bottom: 0.1rem;
+  }
+
+  .admin-table .admin-actions {
+    justify-content: flex-start;
+    margin-top: 0.5rem;
+  }
+}

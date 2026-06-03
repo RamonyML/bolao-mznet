@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Álbum de figurinhas da Copa 2026 com o time MZNET.">
+  <title>Álbum de Figurinhas da Copa 2026 · MZNET</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Dongle&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+  </style>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/album.css">
+</head>
+<body class="album-page">
+  <header class="album-hero">
+    <a href="index.html" class="album-back">Voltar para os palpites</a>
+    <div class="album-hero__inner">
+      <img src="logo/mzlogo-para fundo preto1.png" alt="MZNET" class="album-logo" width="190" height="64">
+      <p class="album-kicker">Copa do Mundo 2026</p>
+      <h1>Álbum de figurinhas da Copa 2026</h1>
+      <p>Confira todo o elenco do time MZNET</p>
+    </div>
+  </header>
+
+  <main class="album-main">
+    <section class="album-toolbar" aria-label="Opções de visualização">
+      <div>
+        <span class="album-count" id="album-count">0 figurinhas</span>
+      </div>
+      <div class="album-view-tabs" role="tablist" aria-label="Modo de visualização">
+        <button type="button" class="album-tab is-active" data-view="grid">Grade 4x2</button>
+        <button type="button" class="album-tab" data-view="single">Individual</button>
+      </div>
+    </section>
+
+    <section id="album-grid-view" class="album-view">
+      <div id="album-grid" class="album-grid" aria-live="polite"></div>
+      <nav class="album-pagination" aria-label="Paginação do álbum">
+        <button type="button" class="album-arrow" id="grid-prev" aria-label="Página anterior">‹</button>
+        <span id="grid-page-label" class="album-page-label">Página 1 de 1</span>
+        <button type="button" class="album-arrow" id="grid-next" aria-label="Próxima página">›</button>
+      </nav>
+    </section>
+
+    <section id="album-single-view" class="album-view album-view--single d-none">
+      <div class="album-carousel" aria-live="polite">
+        <button type="button" class="album-arrow album-arrow--side" id="single-prev" aria-label="Figurinha anterior">‹</button>
+        <div id="album-carousel-track" class="album-carousel__track"></div>
+        <button type="button" class="album-arrow album-arrow--side" id="single-next" aria-label="Próxima figurinha">›</button>
+      </div>
+      <p id="single-page-label" class="album-page-label text-center mt-3 mb-0">1 de 1</p>
+    </section>
+  </main>
+
+  <footer class="album-footer">
+    <p>MZNET 2026</p>
+    <span>Desenvolvido por Ramony Lima</span>
+  </footer>
+
+  <div class="album-modal" id="album-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-name">
+    <button type="button" class="album-modal__close" id="modal-close" aria-label="Fechar">×</button>
+    <button type="button" class="album-arrow album-modal__nav album-modal__nav--prev" id="modal-prev" aria-label="Figurinha anterior">‹</button>
+    <figure class="album-modal__figure">
+      <div class="album-modal__media">
+        <img id="modal-image" src="" alt="" decoding="async">
+      </div>
+      <figcaption>
+        <strong id="modal-name"></strong>
+        <span id="modal-sector"></span>
+      </figcaption>
+    </figure>
+    <button type="button" class="album-arrow album-modal__nav album-modal__nav--next" id="modal-next" aria-label="Próxima figurinha">›</button>
+  </div>
+
+  <script type="module" src="js/album.js"></script>
+</body>
+</html>
