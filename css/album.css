@@ -388,7 +388,6 @@ html {
   transform: translateZ(0);
   margin: 0;
   width: min(420px, 82vw);
-  max-height: calc(100dvh - 7rem);
   text-align: center;
 }
 
@@ -396,15 +395,15 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  min-height: min(52vh, 420px);
+  width: min(100%, calc((100dvh - 10rem) * 1852 / 2457));
+  aspect-ratio: 1852 / 2457;
+  margin-inline: auto;
 }
 
 .album-modal__figure img {
   display: block;
   width: 100%;
-  height: auto;
-  max-height: min(68vh, calc(100dvh - 10rem));
+  height: 100%;
   object-fit: contain;
   border-radius: 12px;
   box-shadow: 0 22px 68px rgba(0, 0, 0, 0.42);

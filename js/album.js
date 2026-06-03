@@ -189,12 +189,25 @@ function loadModalImage(figure) {
   const token = ++modalLoadToken;
   const img = els.modalImage;
   img.alt = `Figurinha de ${figure.name}`;
+  img.onerror = null;
+  img.src = figure.thumbSrc;
+
+  const fullImage = new Image();
+  fullImage.onload = () => {
+    if (token !== modalLoadToken) return;
+    img.src = figure.src;
+  };
+  fullImage.onerror = () => {
+    if (token !== modalLoadToken) return;
+    img.src = figure.thumbSrc;
+  };
   img.onerror = () => {
     if (token !== modalLoadToken) return;
     img.onerror = null;
     img.src = figure.thumbSrc;
   };
-  img.src = figure.src;
+  fullImage.decoding = "async";
+  fullImage.src = figure.src;
 }
 
 function scheduleFigurePreload() {

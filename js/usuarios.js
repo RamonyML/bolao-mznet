@@ -52,6 +52,7 @@ export const USUARIOS_POR_SETOR = {
     "Vagner Junio",
     "Victor Hugo",
     "Vitor Dornelas",
+    "Junior Soares",
     "Vitor Manoel",
   ],
   Outro: ["Dione", "Marcelo", "Zé Renato"],
