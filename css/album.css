@@ -442,6 +442,36 @@ html {
   line-height: 1;
 }
 
+.album-modal__download {
+  position: absolute;
+  z-index: 2;
+  top: 1rem;
+  right: 4.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.album-modal__download:hover,
+.album-modal__download:focus {
+  background: rgba(255, 223, 0, 0.22);
+  transform: translateY(-1px);
+}
+
+.album-modal__download:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+}
+
 .album-modal__nav {
   position: absolute;
   z-index: 2;

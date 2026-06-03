@@ -74,6 +74,7 @@ const els = {
   carouselTrack: document.getElementById("album-carousel-track"),
   modal: document.getElementById("album-modal"),
   modalClose: document.getElementById("modal-close"),
+  modalDownload: document.getElementById("modal-download"),
   modalImage: document.getElementById("modal-image"),
   modalName: document.getElementById("modal-name"),
   modalSector: document.getElementById("modal-sector"),
@@ -311,6 +312,46 @@ function moveModal(direction) {
   openModal(modalIndex + direction);
 }
 
+function downloadFileName(figure) {
+  const ext = (figure.file.match(/\.[^.]+$/) || [".png"])[0];
+  const base = [figure.name, figure.sector]
+    .filter(Boolean)
+    .join(" - ")
+    .replace(/\s+/g, "-");
+  return `${base || "figurinha"}${ext}`;
+}
+
+async function downloadCurrentFigure() {
+  const figure = figures[modalIndex];
+  if (!figure) return;
+  const fileName = downloadFileName(figure);
+  els.modalDownload.disabled = true;
+  try {
+    const response = await fetch(figure.src);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    const link = document.createElement("a");
+    link.href = figure.src;
+    link.download = fileName;
+    link.target = "_blank";
+    link.rel = "noopener";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } finally {
+    els.modalDownload.disabled = false;
+  }
+}
+
 els.tabs.forEach((tab) => {
   tab.addEventListener("click", () => setView(tab.dataset.view));
 });
@@ -340,6 +381,7 @@ els.singleNext.addEventListener("click", () => {
 });
 
 els.modalClose.addEventListener("click", closeModal);
+els.modalDownload.addEventListener("click", downloadCurrentFigure);
 els.modalPrev.addEventListener("click", () => moveModal(-1));
 els.modalNext.addEventListener("click", () => moveModal(1));
 els.modal.addEventListener("click", (event) => {
