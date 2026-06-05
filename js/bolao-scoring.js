@@ -4,6 +4,7 @@ export const PONTOS_PLACAR_EXATO = 5;
 export const PONTOS_RESULTADO = 2;
 
 export const JOGOS_OPCOES = [
+  "Brasil x Egito — Amistoso",
   "Brasil x Marrocos — 13/06 — Fase de grupos",
   "Brasil x Haiti — 19/06 — Fase de grupos",
   "Escócia x Brasil — 24/06 — Fase de grupos",
