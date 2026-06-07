@@ -252,6 +252,15 @@
             </button>
           </div>
 
+          <div class="bets-tabs" role="tablist" aria-label="Filtrar palpites">
+            <button type="button" class="bets-tab is-active" id="tab-aberto" data-tab="aberto" role="tab" aria-selected="true">
+              Em aberto <span class="bets-tab__count" id="count-aberto">0</span>
+            </button>
+            <button type="button" class="bets-tab" id="tab-encerrado" data-tab="encerrado" role="tab" aria-selected="false">
+              Encerrados <span class="bets-tab__count" id="count-encerrado">0</span>
+            </button>
+          </div>
+
           <div id="lista-palpites" class="bets-list d-flex flex-column gap-2" role="list">
             <div class="empty-state text-center py-5" id="empty-state">
               <p class="empty-state__title mb-1">Nenhum palpite ainda</p>

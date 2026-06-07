@@ -69,6 +69,72 @@
   padding: 0.25rem 0.65rem;
 }
 
+/* Cards com imagem de fundo */
+.panel--media {
+  position: relative;
+  border: none;
+  overflow: hidden;
+  background-color: #166635;
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+}
+
+.panel--media::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 0;
+}
+
+.panel--media > * {
+  position: relative;
+  z-index: 1;
+}
+
+.panel--jogos {
+  background-image: url("../backgrounds/fundo-faixa.jpg");
+}
+
+.panel--resultado {
+  background-image: url("../backgrounds/fundo.png");
+}
+
+.panel--media h2,
+.panel--media > p,
+.panel--media .form-label {
+  color: #fff !important;
+}
+
+.panel--media .form-label .text-muted {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.panel--media .jogos-empty {
+  color: #fff;
+}
+
+/* Botões claros sobre as imagens */
+.panel--media .btn-success {
+  background: #fff;
+  border-color: #fff;
+  color: #166635;
+}
+
+.panel--media .btn-success:hover,
+.panel--media .btn-success:focus {
+  background: #f1f5f0;
+  border-color: #f1f5f0;
+  color: #0f4f28;
+}
+
+.panel--media .btn-light {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: transparent;
+  color: #374151;
+}
+
 .resultados-list {
   display: flex;
   flex-direction: column;

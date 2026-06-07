@@ -16,7 +16,7 @@ import {
   medalForRank,
   resultadosToMap,
 } from "./bolao-scoring.js";
-import { fillJogoSelect } from "./jogos-select.js";
+import { fillJogoSelect, setJogosCustomizados } from "./jogos-select.js";
 import { fillSetorSelect } from "./setores.js";
 import { renderFlagHtml, setFlagInElement } from "./team-flags.js";
 import { initNomeAutocomplete } from "./nome-autocomplete.js";
@@ -27,6 +27,7 @@ const COLLECTION_PALPITES = "palpites";
 const COLLECTION_RESULTADOS = "resultados";
 const COLLECTION_CONFIG = "config";
 const FEATURES_DOC = "features";
+const JOGOS_DOC = "jogos";
 const REACTIONS = [
   { key: "fire", emoji: "🔥", label: "Esse palpite é brabo" },
   { key: "laugh", emoji: "😂", label: "Achei engraçado" },
@@ -38,6 +39,11 @@ const els = {
   form: document.getElementById("form-palpite"),
   lista: document.getElementById("lista-palpites"),
   empty: document.getElementById("empty-state"),
+  emptyTitle: document.querySelector("#empty-state .empty-state__title"),
+  emptyHint: document.querySelector("#empty-state .empty-state__hint"),
+  tabs: document.querySelectorAll(".bets-tab"),
+  countAberto: document.getElementById("count-aberto"),
+  countEncerrado: document.getElementById("count-encerrado"),
   toast: document.getElementById("toast"),
   statTotal: document.getElementById("stat-total"),
   btnSort: document.getElementById("btn-sort"),
@@ -61,6 +67,7 @@ const els = {
 };
 
 let sortNewestFirst = true;
+let activeTab = "aberto";
 let palpites = [];
 let resultadosMap = new Map();
 let lastLeaderKey = null;
@@ -134,7 +141,7 @@ function aplicarSetorUsuario(setor) {
 function parseJogoSelect() {
   const opt = els.jogo.options[els.jogo.selectedIndex];
   if (!opt || !opt.value) return;
-  const match = opt.text.match(/^(.+?)\s+x\s+(.+?)\s+—/i);
+  const match = opt.text.match(/^(.+?)\s+x\s+(.+?)(?:\s+—.*)?$/i);
   if (match) {
     els.timeHome.value = match[1].trim();
     els.timeAway.value = match[2].trim();
@@ -344,6 +351,21 @@ function renderCard(p, index) {
   return card;
 }
 
+function isEncerrado(palpite) {
+  return resultadosMap.has(palpite.jogo);
+}
+
+function setEmptyState(tab) {
+  if (tab === "encerrado") {
+    els.emptyTitle.textContent = "Nenhum palpite encerrado";
+    els.emptyHint.textContent =
+      "Os palpites aparecem aqui quando o jogo tiver resultado oficial.";
+  } else {
+    els.emptyTitle.textContent = "Nenhum palpite em aberto";
+    els.emptyHint.textContent = "Seja o primeiro a registrar o seu.";
+  }
+}
+
 function renderList() {
   const sorted = [...palpites].sort((a, b) => {
     const ta = new Date(toIsoDate(a.createdAt)).getTime();
@@ -352,13 +374,22 @@ function renderList() {
   });
 
   els.statTotal.textContent = String(sorted.length);
+
+  const abertos = sorted.filter((p) => !isEncerrado(p));
+  const encerrados = sorted.filter((p) => isEncerrado(p));
+  els.countAberto.textContent = String(abertos.length);
+  els.countEncerrado.textContent = String(encerrados.length);
+
+  const atual = activeTab === "encerrado" ? encerrados : abertos;
+
   els.lista.querySelectorAll(".bet-card").forEach((c) => c.remove());
 
-  if (sorted.length === 0) {
+  if (atual.length === 0) {
+    setEmptyState(activeTab);
     els.empty.classList.remove("d-none");
   } else {
     els.empty.classList.add("d-none");
-    sorted.forEach((p, i) => els.lista.appendChild(renderCard(p, i)));
+    atual.forEach((p, i) => els.lista.appendChild(renderCard(p, i)));
   }
 
   renderRanking();
@@ -395,6 +426,18 @@ function applyFeatureFlags() {
   if (els.pacotinhoSection) {
     els.pacotinhoSection.classList.toggle("d-none", !featureFlags.figurinhaSurpresa);
   }
+}
+
+function subscribeJogos() {
+  onSnapshot(
+    doc(db, COLLECTION_CONFIG, JOGOS_DOC),
+    (snapshot) => {
+      const data = snapshot.exists() ? snapshot.data() : {};
+      setJogosCustomizados(data.lista || []);
+      fillJogoSelect(els.jogo);
+    },
+    (error) => console.error(error)
+  );
 }
 
 function subscribeConfig() {
@@ -460,6 +503,19 @@ els.btnSort.addEventListener("click", () => {
   renderList();
 });
 
+els.tabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    if (activeTab === tab.dataset.tab) return;
+    activeTab = tab.dataset.tab;
+    els.tabs.forEach((t) => {
+      const isActive = t === tab;
+      t.classList.toggle("is-active", isActive);
+      t.setAttribute("aria-selected", isActive ? "true" : "false");
+    });
+    renderList();
+  });
+});
+
 [els.timeHome, els.timeAway].forEach((el) =>
   el.addEventListener("input", updatePreview)
 );
@@ -476,6 +532,7 @@ initPacotinho();
 initPlayerCard();
 bindScoreSync();
 updatePreview();
+subscribeJogos();
 subscribeConfig();
 subscribePalpites();
 subscribeResultados();

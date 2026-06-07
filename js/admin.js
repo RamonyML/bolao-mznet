@@ -10,6 +10,8 @@ import {
   setDoc,
   serverTimestamp,
   writeBatch,
+  arrayUnion,
+  arrayRemove,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 import {
   signInWithEmailAndPassword,
@@ -23,13 +25,18 @@ import {
   resultadosToMap,
   jogoDocId,
 } from "./bolao-scoring.js";
-import { fillJogoSelect } from "./jogos-select.js";
+import {
+  fillJogoSelect,
+  setJogosCustomizados,
+  getJogosAtuais,
+} from "./jogos-select.js";
 import { fillSetorSelect } from "./setores.js";
 
 const COLLECTION = "palpites";
 const COLLECTION_RESULTADOS = "resultados";
 const COLLECTION_CONFIG = "config";
 const FEATURES_DOC = "features";
+const JOGOS_DOC = "jogos";
 const FEATURE_KEYS = ["figurinhaSurpresa", "reactions", "confetti"];
 
 const els = {
@@ -77,6 +84,12 @@ const els = {
   btnFeatures: document.getElementById("btn-features"),
   featureSwitches: document.querySelectorAll(".feature-switch"),
   btnClearReactions: document.getElementById("btn-clear-reactions"),
+  formJogo: document.getElementById("form-jogo"),
+  jogoTimeHome: document.getElementById("jogo-time-home"),
+  jogoTimeAway: document.getElementById("jogo-time-away"),
+  jogoDetalhe: document.getElementById("jogo-detalhe"),
+  btnAddJogo: document.getElementById("btn-add-jogo"),
+  jogosList: document.getElementById("jogos-list"),
 };
 
 const modalEdit = new bootstrap.Modal(document.getElementById("modal-edit"));
@@ -88,9 +101,11 @@ const modalFeatures = new bootstrap.Modal(document.getElementById("modal-feature
 let palpites = [];
 let resultados = [];
 let resultadosMap = new Map();
+let jogosCustomizados = [];
 let unsubscribeList = null;
 let unsubscribeResultados = null;
 let unsubscribeConfig = null;
+let unsubscribeJogos = null;
 let searchTerm = "";
 
 function showToast(message) {
@@ -359,6 +374,10 @@ function stopSubscriptions() {
     unsubscribeConfig();
     unsubscribeConfig = null;
   }
+  if (unsubscribeJogos) {
+    unsubscribeJogos();
+    unsubscribeJogos = null;
+  }
   palpites = [];
   resultados = [];
   resultadosMap = new Map();
@@ -547,6 +566,104 @@ async function saveFeatureFlag(key, enabled, control) {
   }
 }
 
+function refillJogoSelects() {
+  fillJogoSelect(els.resultadoJogo);
+  fillJogoSelect(els.editJogo);
+}
+
+function renderJogosList() {
+  els.jogosList.innerHTML = "";
+  if (jogosCustomizados.length === 0) {
+    els.jogosList.innerHTML =
+      '<span class="jogos-empty small">Nenhum novo jogo criado ainda. Os jogos fixos da fase de grupos já estão disponíveis na area de palpites</span>';
+    return;
+  }
+
+  jogosCustomizados.forEach((jogo) => {
+    const item = document.createElement("div");
+    item.className = "resultado-item";
+    item.innerHTML = `
+      <div class="resultado-item__info">
+        <span class="resultado-item__jogo">${escapeHtml(jogo)}</span>
+        <span class="resultado-item__placar">Criado pelo admin</span>
+      </div>
+      <div class="admin-actions">
+        <button type="button" class="btn btn-outline-danger rounded-pill btn-delete-jogo">Remover</button>
+      </div>
+    `;
+    item
+      .querySelector(".btn-delete-jogo")
+      .addEventListener("click", () => removeJogo(jogo));
+    els.jogosList.appendChild(item);
+  });
+}
+
+function subscribeJogos() {
+  if (unsubscribeJogos) unsubscribeJogos();
+  unsubscribeJogos = onSnapshot(
+    doc(db, COLLECTION_CONFIG, JOGOS_DOC),
+    (snapshot) => {
+      const data = snapshot.exists() ? snapshot.data() : {};
+      jogosCustomizados = Array.isArray(data.lista)
+        ? data.lista.filter(Boolean)
+        : [];
+      setJogosCustomizados(jogosCustomizados);
+      refillJogoSelects();
+      renderJogosList();
+    },
+    (error) => console.error(error)
+  );
+}
+
+async function addJogo(e) {
+  e.preventDefault();
+  const timeHome = els.jogoTimeHome.value.trim();
+  const timeAway = els.jogoTimeAway.value.trim();
+  const detalhe = els.jogoDetalhe.value.trim();
+  if (!timeHome || !timeAway) return;
+
+  const jogo = detalhe
+    ? `${timeHome} x ${timeAway} — ${detalhe}`
+    : `${timeHome} x ${timeAway}`;
+
+  if (getJogosAtuais().includes(jogo)) {
+    showToast("Esse jogo já existe na lista.");
+    return;
+  }
+
+  els.btnAddJogo.disabled = true;
+  try {
+    await setDoc(
+      doc(db, COLLECTION_CONFIG, JOGOS_DOC),
+      { lista: arrayUnion(jogo), updatedAt: serverTimestamp() },
+      { merge: true }
+    );
+    els.formJogo.reset();
+    showToast("Jogo adicionado!");
+  } catch (error) {
+    console.error(error);
+    showToast("Erro ao adicionar o jogo.");
+  } finally {
+    els.btnAddJogo.disabled = false;
+  }
+}
+
+async function removeJogo(jogo) {
+  if (!confirm(`Remover o jogo "${jogo}" do select? Os palpites já registrados continuam salvos.`)) {
+    return;
+  }
+  try {
+    await updateDoc(doc(db, COLLECTION_CONFIG, JOGOS_DOC), {
+      lista: arrayRemove(jogo),
+      updatedAt: serverTimestamp(),
+    });
+    showToast("Jogo removido.");
+  } catch (error) {
+    console.error(error);
+    showToast("Erro ao remover o jogo.");
+  }
+}
+
 async function clearAllReactions() {
   if (palpites.length === 0) {
     showToast("Não há palpites para limpar.");
@@ -619,6 +736,7 @@ els.adminSearch.addEventListener("input", () => {
 els.formEdit.addEventListener("submit", saveEdit);
 els.formResultado.addEventListener("submit", saveResultado);
 els.formEditResultado.addEventListener("submit", saveEditResultado);
+els.formJogo.addEventListener("submit", addJogo);
 els.btnCancelResultado.addEventListener("click", resetResultadoForm);
 
 fillJogoSelect(els.resultadoJogo);
@@ -632,6 +750,7 @@ onAuthStateChanged(auth, (user) => {
     subscribePalpites();
     subscribeResultados();
     subscribeConfig();
+    subscribeJogos();
   } else {
     setView(false);
     stopSubscriptions();

@@ -619,6 +619,58 @@ body.site-page .main-content {
 }
 
 /* Lista */
+.bets-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.bets-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #6b7280;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.bets-tab:hover {
+  border-color: #166635;
+  color: #166635;
+}
+
+.bets-tab.is-active {
+  background: #166635;
+  border-color: #166635;
+  color: #fff;
+}
+
+.bets-tab__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  color: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.bets-tab.is-active .bets-tab__count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
 .bets-list {
   max-height: min(65vh, 560px);
   overflow-y: auto;
