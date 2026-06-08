@@ -229,16 +229,30 @@
         </section>
 
         <section class="panel animate-fade-up mb-4" aria-labelledby="ranking-title">
-          <div class="panel__head">
-            <h2 id="ranking-title" class="panel__title mb-0">Melhores palpiteiros</h2>
-            <p class="panel__desc mb-0">5 pts placar exato · 2 pts resultado do jogo</p>
+          <div class="panel__head panel__head--row">
+            <div>
+              <h2 id="ranking-title" class="panel__title mb-0">Melhores palpiteiros</h2>
+              <p class="panel__desc mb-0">5 pts placar exato · 2 pts resultado do jogo</p>
+            </div>
+            <label class="model-switch" for="ranking-mode-toggle" title="Alternar entre o modelo atual e a tabela de pontos corridos">
+              <span class="model-switch__text">Alterar modelo</span>
+              <span class="model-switch__control">
+                <input type="checkbox" id="ranking-mode-toggle" role="switch" aria-label="Alternar para tabela de pontos corridos">
+                <span class="model-switch__slider" aria-hidden="true"></span>
+              </span>
+            </label>
           </div>
-          <div id="ranking-podium" class="podium d-none" aria-label="Pódio"></div>
-          <div id="ranking-list" class="ranking-list">
-            <p class="ranking-empty text-muted small text-center py-3 mb-0" id="ranking-empty">
-              O resultado do trem vai aparecer quando a Carol definir os resultados oficiais.
-            </p>
+
+          <p class="ranking-empty text-muted small text-center py-3 mb-0" id="ranking-empty">
+            O resultado do trem vai aparecer quando a Carol definir os resultados oficiais.
+          </p>
+
+          <div id="ranking-classic">
+            <div id="ranking-podium" class="podium d-none" aria-label="Pódio"></div>
+            <div id="ranking-list" class="ranking-list"></div>
           </div>
+
+          <div id="ranking-table" class="league-table d-none" aria-label="Tabela de pontos corridos"></div>
         </section>
 
         <section class="panel animate-fade-up panel--list" aria-labelledby="list-title">

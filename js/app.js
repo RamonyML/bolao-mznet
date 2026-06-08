@@ -22,6 +22,11 @@ import { renderFlagHtml, setFlagInElement } from "./team-flags.js";
 import { initNomeAutocomplete } from "./nome-autocomplete.js";
 import { initPacotinho } from "./pacotinho.js";
 import { initPlayerCard, openPlayerCard } from "./card-palpiteiro.js";
+import {
+  findFigureByName,
+  figureThumbPath,
+  figureImagePath,
+} from "./figurinhas-data.js";
 
 const COLLECTION_PALPITES = "palpites";
 const COLLECTION_RESULTADOS = "resultados";
@@ -63,14 +68,20 @@ const els = {
   rankingList: document.getElementById("ranking-list"),
   rankingEmpty: document.getElementById("ranking-empty"),
   rankingPodium: document.getElementById("ranking-podium"),
+  rankingClassic: document.getElementById("ranking-classic"),
+  rankingTable: document.getElementById("ranking-table"),
+  rankingModeToggle: document.getElementById("ranking-mode-toggle"),
   pacotinhoSection: document.getElementById("pacotinho-section"),
 };
 
+const RANKING_MODE_KEY = "bolao-ranking-mode";
 let sortNewestFirst = true;
 let activeTab = "aberto";
 let palpites = [];
 let resultadosMap = new Map();
 let lastLeaderKey = null;
+let rankingMode =
+  localStorage.getItem(RANKING_MODE_KEY) === "classic" ? "classic" : "table";
 const featureFlags = {
   figurinhaSurpresa: true,
   reactions: true,
@@ -239,19 +250,19 @@ function renderPodium(top) {
   });
 }
 
-function renderRanking() {
-  const ranking = buildRanking(palpites, resultadosMap);
+const RANK_TIERS = ["gold", "silver", "bronze"];
+
+function iniciaisNome(nome) {
+  return (nome || "?")
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0].toUpperCase())
+    .join("");
+}
+
+function renderClassicRanking(ranking) {
   els.rankingList.querySelectorAll(".ranking-item").forEach((el) => el.remove());
-
-  if (ranking.length === 0) {
-    els.rankingEmpty.classList.remove("d-none");
-    els.rankingPodium.classList.add("d-none");
-    els.rankingPodium.innerHTML = "";
-    lastLeaderKey = null;
-    return;
-  }
-
-  els.rankingEmpty.classList.add("d-none");
 
   renderPodium(ranking.slice(0, 3));
   els.rankingPodium.classList.remove("d-none");
@@ -275,6 +286,156 @@ function renderRanking() {
     item.addEventListener("click", () => openPlayerCard(row, posicao));
     els.rankingList.appendChild(item);
   });
+}
+
+function renderTableRanking(ranking) {
+  els.rankingTable.innerHTML = "";
+
+  const head = document.createElement("div");
+  head.className = "league-row league-row--head";
+  head.innerHTML = `
+    <span class="league-cell league-cell--pos">#</span>
+    <span class="league-cell league-cell--player">Palpiteiro</span>
+    <span class="league-cell league-cell--pts">Pts</span>
+    <span class="league-cell league-cell--num" title="Placares exatos">E</span>
+    <span class="league-cell league-cell--num" title="Acertos">A</span>
+    <span class="league-cell league-cell--num" title="Palpites">P</span>
+  `;
+  els.rankingTable.appendChild(head);
+
+  ranking.forEach((row, i) => {
+    const posicao = i + 1;
+    const tier = RANK_TIERS[i] || "";
+    const figura = findFigureByName(row.nome);
+
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "league-row" + (tier ? ` league-row--${tier}` : "");
+    item.setAttribute("aria-label", `Ver figurinha de ${row.nome}`);
+
+    const iconHtml = figura
+      ? `<img class="league-figure" src="${figureThumbPath(figura.file)}" alt="" loading="lazy" decoding="async">`
+      : `<span class="league-figure league-figure--empty">${escapeHtml(iniciaisNome(row.nome))}</span>`;
+
+    item.innerHTML = `
+      <span class="league-cell league-cell--pos">${posicao}</span>
+      <span class="league-cell league-cell--player">
+        ${iconHtml}
+        <span class="league-name">${escapeHtml(row.nome)}</span>
+      </span>
+      <span class="league-cell league-cell--pts">${row.pontos}</span>
+      <span class="league-cell league-cell--num">${row.exatos}</span>
+      <span class="league-cell league-cell--num">${row.acertos}</span>
+      <span class="league-cell league-cell--num">${row.palpites}</span>
+    `;
+
+    item.addEventListener("click", () => openPlayerCard(row, posicao));
+    item.addEventListener("mouseenter", () =>
+      showRankingPreview(row, tier, item)
+    );
+    item.addEventListener("mouseleave", hideRankingPreview);
+    els.rankingTable.appendChild(item);
+  });
+}
+
+let rankingPreviewEl = null;
+
+function ensureRankingPreview() {
+  if (rankingPreviewEl) return rankingPreviewEl;
+  rankingPreviewEl = document.createElement("div");
+  rankingPreviewEl.className = "rank-preview";
+  rankingPreviewEl.setAttribute("aria-hidden", "true");
+  document.body.appendChild(rankingPreviewEl);
+  return rankingPreviewEl;
+}
+
+function isHoverDesktop() {
+  return (
+    window.matchMedia("(min-width: 992px)").matches &&
+    window.matchMedia("(hover: hover)").matches
+  );
+}
+
+function positionRankingPreview(anchorEl) {
+  const tip = rankingPreviewEl;
+  if (!tip) return;
+  const rect = anchorEl.getBoundingClientRect();
+  const tipRect = tip.getBoundingClientRect();
+
+  let left = window.scrollX + rect.left - tipRect.width - 12;
+  if (rect.left - tipRect.width - 12 < 8) {
+    left = window.scrollX + rect.right + 12;
+  }
+
+  let top = window.scrollY + rect.top + rect.height / 2 - tipRect.height / 2;
+  const minTop = window.scrollY + 8;
+  const maxTop = window.scrollY + window.innerHeight - tipRect.height - 8;
+  top = Math.max(minTop, Math.min(maxTop, top));
+
+  tip.style.top = `${top}px`;
+  tip.style.left = `${left}px`;
+}
+
+function showRankingPreview(row, tier, anchorEl) {
+  if (!isHoverDesktop()) return;
+  const tip = ensureRankingPreview();
+  const figura = findFigureByName(row.nome);
+  const setor = figura?.setor || row.setor || "";
+
+  tip.className = `rank-preview rank-preview--${tier || "default"}`;
+  const imgHtml = figura
+    ? `<img class="rank-preview__img" src="${figureImagePath(figura.file)}" alt="">`
+    : `<span class="rank-preview__img rank-preview__img--empty">${escapeHtml(iniciaisNome(row.nome))}</span>`;
+
+  tip.innerHTML = `
+    ${imgHtml}
+    <div class="rank-preview__info">
+      <strong class="rank-preview__name">${escapeHtml(row.nome)}</strong>
+      ${setor ? `<span class="rank-preview__sector">${escapeHtml(setor)}</span>` : ""}
+      <span class="rank-preview__pts">${row.pontos} pts</span>
+    </div>
+  `;
+
+  tip.classList.add("is-visible");
+  positionRankingPreview(anchorEl);
+}
+
+function hideRankingPreview() {
+  if (rankingPreviewEl) rankingPreviewEl.classList.remove("is-visible");
+}
+
+function applyRankingMode() {
+  if (els.rankingModeToggle) {
+    els.rankingModeToggle.checked = rankingMode === "table";
+  }
+}
+
+function renderRanking() {
+  const ranking = buildRanking(palpites, resultadosMap);
+  const isTable = rankingMode === "table";
+
+  if (ranking.length === 0) {
+    els.rankingEmpty.classList.remove("d-none");
+    els.rankingClassic.classList.add("d-none");
+    els.rankingTable.classList.add("d-none");
+    els.rankingPodium.classList.add("d-none");
+    els.rankingPodium.innerHTML = "";
+    els.rankingList.querySelectorAll(".ranking-item").forEach((el) => el.remove());
+    els.rankingTable.innerHTML = "";
+    hideRankingPreview();
+    lastLeaderKey = null;
+    return;
+  }
+
+  els.rankingEmpty.classList.add("d-none");
+  els.rankingClassic.classList.toggle("d-none", isTable);
+  els.rankingTable.classList.toggle("d-none", !isTable);
+
+  if (isTable) {
+    renderTableRanking(ranking);
+  } else {
+    renderClassicRanking(ranking);
+  }
 
   const leaderKey = (ranking[0].nome || "").trim().toLowerCase();
   if (leaderKey && leaderKey !== lastLeaderKey) {
@@ -503,6 +664,16 @@ els.btnSort.addEventListener("click", () => {
   renderList();
 });
 
+els.rankingModeToggle?.addEventListener("change", () => {
+  rankingMode = els.rankingModeToggle.checked ? "table" : "classic";
+  localStorage.setItem(RANKING_MODE_KEY, rankingMode);
+  hideRankingPreview();
+  renderRanking();
+});
+
+window.addEventListener("scroll", hideRankingPreview, { passive: true });
+window.addEventListener("resize", hideRankingPreview);
+
 els.tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     if (activeTab === tab.dataset.tab) return;
@@ -530,6 +701,7 @@ initNomeAutocomplete({
 });
 initPacotinho();
 initPlayerCard();
+applyRankingMode();
 bindScoreSync();
 updatePreview();
 subscribeJogos();

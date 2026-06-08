@@ -52,6 +52,11 @@ const FIGURE_FILES = [
   "51-José-Junior_Suporte.png",
   "52-Halysson_Suporte.png",
   "53-Vitor-Dornelas_Suporte.png",
+  "54-Fabio-Alves_Estoque.jpeg",
+  "55-Halen_Financeiro.jpeg",
+  "56-Maxson.jpeg",
+  "56-Vitoria_Financeiro.jpeg",
+  "57-Thalyta_Financeiro.jpeg",
 ];
 
 const GRID_PAGE_SIZE = 8;

@@ -52,10 +52,20 @@ export const FIGURINHAS = [
   { nome: "José Junior", setor: "Suporte", file: "51-José-Junior_Suporte.png" },
   { nome: "Halysson Gelado", setor: "Suporte", file: "52-Halysson_Suporte.png" },
   { nome: "Vitor Dornelas", setor: "Suporte", file: "53-Vitor-Dornelas_Suporte.png" },
+  { nome: "Fábio Alves", setor: "Estoque", file: "54-Fabio-Alves_Estoque.jpeg" },
+  { nome: "Halen", setor: "Financeiro", file: "55-Halen_Financeiro.jpeg" },
+  { nome: "Maxson", setor: "", file: "56-Maxson.jpeg" },
+  { nome: "Vitória", setor: "Financeiro", file: "56-Vitoria_Financeiro.jpeg" },
+  { nome: "Thalyta", setor: "Financeiro", file: "57-Thalyta_Financeiro.jpeg" },
 ];
 
 export function figureImagePath(file) {
   return `figures/${encodeURIComponent(file)}`;
+}
+
+export function figureThumbPath(file) {
+  const webpFile = file.replace(/\.[^.]+$/, ".webp");
+  return `figures/thumbs/${encodeURIComponent(webpFile)}`;
 }
 
 function normalizar(texto) {
