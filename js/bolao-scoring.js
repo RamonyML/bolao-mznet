@@ -107,7 +107,8 @@ export function resultadosToMap(docs) {
 }
 
 /**
- * Ranking por nome (soma de pontos de todos os palpites com resultado definido)
+ * Ranking por nome (soma de pontos de todos os palpites com resultado definido).
+ * Palpites registrados depois do resultado oficial são ignorados (anti-trapaça).
  */
 export function buildRanking(palpites, resultadosMap) {
   const byNome = new Map();
@@ -115,6 +116,7 @@ export function buildRanking(palpites, resultadosMap) {
   palpites.forEach((p) => {
     const av = avaliarPalpite(p, resultadosMap);
     if (av.status === "pending") return;
+    if (av.registeredAfterResult) return;
 
     const key = (p.nome || "").trim().toLowerCase();
     const display = (p.nome || "").trim();

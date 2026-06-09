@@ -679,7 +679,7 @@ async function clearAllReactions() {
 
   els.btnClearReactions.disabled = true;
   try {
-    const zeradas = { fire: 0, laugh: 0, clap: 0, chicken: 0 };
+    const zeradas = { fire: 0, laugh: 0, clap: 0, chicken: 0, popcorn: 0 };
     const batch = writeBatch(db);
     palpites.forEach((p) => {
       batch.update(doc(db, COLLECTION, p.id), { reactions: zeradas });

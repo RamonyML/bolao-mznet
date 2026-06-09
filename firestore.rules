@@ -4,11 +4,12 @@ service cloud.firestore {
   match /databases/{database}/documents {
     function isValidReactionMap(reactions) {
       return reactions is map
-        && reactions.keys().hasOnly(['fire', 'laugh', 'clap', 'chicken'])
+        && reactions.keys().hasOnly(['fire', 'laugh', 'clap', 'chicken', 'popcorn'])
         && (!('fire' in reactions) || (reactions.fire is int && reactions.fire >= 0 && reactions.fire <= 9999))
         && (!('laugh' in reactions) || (reactions.laugh is int && reactions.laugh >= 0 && reactions.laugh <= 9999))
         && (!('clap' in reactions) || (reactions.clap is int && reactions.clap >= 0 && reactions.clap <= 9999))
-        && (!('chicken' in reactions) || (reactions.chicken is int && reactions.chicken >= 0 && reactions.chicken <= 9999));
+        && (!('chicken' in reactions) || (reactions.chicken is int && reactions.chicken >= 0 && reactions.chicken <= 9999))
+        && (!('popcorn' in reactions) || (reactions.popcorn is int && reactions.popcorn >= 0 && reactions.popcorn <= 9999));
     }
 
     function isPublicReactionUpdate() {

@@ -38,6 +38,7 @@ const REACTIONS = [
   { key: "laugh", emoji: "😂", label: "Achei engraçado" },
   { key: "clap", emoji: "👏", label: "Boa aposta" },
   { key: "chicken", emoji: "🐔", label: "Pipocou" },
+  { key: "popcorn", emoji: "🍿", label: "Vai pipocar" },
 ];
 
 const els = {
