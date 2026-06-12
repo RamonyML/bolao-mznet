@@ -60,7 +60,8 @@ export const FIGURINHAS = [
 ];
 
 export function figureImagePath(file) {
-  return `figures/${encodeURIComponent(file)}`;
+  const webpFile = file.replace(/\.[^.]+$/, ".webp");
+  return `figures/web/${encodeURIComponent(webpFile)}`;
 }
 
 export function figureThumbPath(file) {

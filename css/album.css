@@ -21,7 +21,7 @@ html {
   position: fixed;
   inset: 0;
   z-index: -2;
-  background: url("../backgrounds/fundo.png") center / cover no-repeat fixed;
+  background: url("../backgrounds/fundo.webp") center / cover no-repeat fixed;
   filter: brightness(0.76) blur(3px);
 }
 
@@ -335,7 +335,7 @@ html {
   text-align: center;
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.52)),
-    url("../backgrounds/fundo-faixa.jpg") center 54% / cover no-repeat;
+    url("../backgrounds/fundo-faixa.webp") center 54% / cover no-repeat;
 }
 
 .album-footer p,

@@ -94,11 +94,11 @@
 }
 
 .panel--jogos {
-  background-image: url("../backgrounds/fundo-faixa.jpg");
+  background-image: url("../backgrounds/fundo-faixa.webp");
 }
 
 .panel--resultado {
-  background-image: url("../backgrounds/fundo.png");
+  background-image: url("../backgrounds/fundo.webp");
 }
 
 .panel--media h2,

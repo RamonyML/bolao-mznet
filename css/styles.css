@@ -1403,7 +1403,7 @@ body.site-page .main-content {
   text-align: center;
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.52)),
-    url("../backgrounds/fundo-faixa.jpg") center 54% / cover no-repeat;
+    url("../backgrounds/fundo-faixa.webp") center 54% / cover no-repeat;
 }
 
 .site-footer p,

@@ -100,12 +100,16 @@ let modalLoadToken = 0;
 let modalOpenedAt = 0;
 const preloadedFullImages = new Set();
 
+function webFigureFile(file) {
+  return file.replace(/\.[^.]+$/, ".webp");
+}
+
 function assetPath(file) {
-  return `figures/${encodeURIComponent(file)}`;
+  return `figures/web/${encodeURIComponent(webFigureFile(file))}`;
 }
 
 function thumbPath(file) {
-  const webpFile = file.replace(/\.[^.]+$/, ".webp");
+  const webpFile = webFigureFile(file);
   return `figures/thumbs/${encodeURIComponent(webpFile)}`;
 }
 
@@ -331,12 +335,11 @@ function moveModal(direction) {
 }
 
 function downloadFileName(figure) {
-  const ext = (figure.file.match(/\.[^.]+$/) || [".png"])[0];
   const base = [figure.name, figure.sector]
     .filter(Boolean)
     .join(" - ")
     .replace(/\s+/g, "-");
-  return `${base || "figurinha"}${ext}`;
+  return `${base || "figurinha"}.webp`;
 }
 
 async function downloadCurrentFigure() {

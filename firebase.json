@@ -5,6 +5,12 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**",
+      "test-results/**",
+      "figures/*.png",
+      "figures/*.jpg",
+      "figures/*.jpeg",
+      "backgrounds/fundo.png",
+      "backgrounds/fundo-faixa.jpg",
       "firestore.rules",
       "firestore.indexes.json",
       "README.md"
