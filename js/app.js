@@ -582,8 +582,9 @@ function renderList() {
   els.countEncerrado.textContent = String(encerrados.length);
   els.countExatos.textContent = String(exatos.length);
 
-  let atual = activeTab === "exatos" ? exatos : activeTab === "encerrado" ? encerrados : abertos;
-  if (activeJogo) atual = atual.filter((p) => p.jogo === activeJogo);
+  let atual = activeJogo
+    ? sorted.filter((p) => p.jogo === activeJogo)
+    : activeTab === "exatos" ? exatos : activeTab === "encerrado" ? encerrados : abertos;
 
   els.lista.querySelectorAll(".bet-card").forEach((c) => c.remove());
 
