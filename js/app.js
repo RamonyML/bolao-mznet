@@ -56,6 +56,7 @@ const els = {
   toast: document.getElementById("toast"),
   statTotal: document.getElementById("stat-total"),
   btnSort: document.getElementById("btn-sort"),
+  buscaNome: document.getElementById("busca-nome"),
   submitBtn: document.querySelector(".btn-submit"),
   nome: document.getElementById("nome"),
   nomeSuggestions: document.getElementById("nome-suggestions"),
@@ -83,6 +84,7 @@ const RANKING_MODE_KEY = "bolao-ranking-mode";
 let sortNewestFirst = true;
 let activeTab = "aberto";
 let activeJogo = "";
+let activeSearch = "";
 let palpites = [];
 let resultadosMap = new Map();
 let lastLeaderKey = null;
@@ -586,6 +588,11 @@ function renderList() {
     ? sorted.filter((p) => p.jogo === activeJogo)
     : activeTab === "exatos" ? exatos : activeTab === "encerrado" ? encerrados : abertos;
 
+  if (activeSearch) {
+    const term = activeSearch.toLowerCase();
+    atual = atual.filter((p) => (p.nome || "").toLowerCase().includes(term));
+  }
+
   els.lista.querySelectorAll(".bet-card").forEach((c) => c.remove());
 
   if (atual.length === 0) {
@@ -727,6 +734,11 @@ els.rankingModeToggle?.addEventListener("change", () => {
 
 els.filtroJogo?.addEventListener("change", () => {
   activeJogo = els.filtroJogo.value;
+  renderList();
+});
+
+els.buscaNome?.addEventListener("input", () => {
+  activeSearch = els.buscaNome.value.trim();
   renderList();
 });
 
