@@ -584,13 +584,14 @@ function renderList() {
   els.countEncerrado.textContent = String(encerrados.length);
   els.countExatos.textContent = String(exatos.length);
 
-  let atual = activeJogo
-    ? sorted.filter((p) => p.jogo === activeJogo)
-    : activeTab === "exatos" ? exatos : activeTab === "encerrado" ? encerrados : abertos;
-
+  let atual;
   if (activeSearch) {
     const term = activeSearch.toLowerCase();
-    atual = atual.filter((p) => (p.nome || "").toLowerCase().includes(term));
+    atual = sorted.filter((p) => (p.nome || "").toLowerCase().includes(term));
+  } else if (activeJogo) {
+    atual = sorted.filter((p) => p.jogo === activeJogo);
+  } else {
+    atual = activeTab === "exatos" ? exatos : activeTab === "encerrado" ? encerrados : abertos;
   }
 
   els.lista.querySelectorAll(".bet-card").forEach((c) => c.remove());
