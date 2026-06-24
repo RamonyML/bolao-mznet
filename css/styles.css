@@ -619,12 +619,49 @@ body.site-page .main-content {
 }
 
 /* Lista */
-.bets-tabs {
+.bets-controls {
   display: flex;
-  gap: 0.4rem;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
   margin-bottom: 1rem;
   padding-bottom: 0.85rem;
   border-bottom: 1px solid #e5e7eb;
+}
+
+.bets-tabs {
+  display: flex;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.bets-filter-jogo {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #374151;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 2rem 0.4rem 0.9rem;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  max-width: 220px;
+  transition: border-color 0.18s ease;
+}
+
+.bets-filter-jogo:hover {
+  border-color: #166635;
+  color: #166635;
+}
+
+.bets-filter-jogo:focus {
+  outline: none;
+  border-color: #166635;
+  box-shadow: 0 0 0 2px rgba(22, 102, 53, 0.15);
 }
 
 .bets-tab {
@@ -751,6 +788,21 @@ body.site-page .main-content {
 .bet-badge--late {
   background: #dc2626;
   color: #fff;
+}
+
+.bet-badge--duplicate {
+  background: #f97316;
+  color: #fff;
+}
+
+.bet-card__duplicate-notice {
+  margin: 0.6rem 0 0;
+  padding: 0.5rem 0.75rem;
+  background: #fff7ed;
+  border-left: 3px solid #f97316;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.8rem;
+  color: #9a3412;
 }
 
 .bet-card__oficial {

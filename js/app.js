@@ -13,8 +13,10 @@ import {
 import {
   avaliarPalpite,
   buildRanking,
+  buildDuplicateSet,
   medalForRank,
   resultadosToMap,
+  JOGOS_OPCOES,
 } from "./bolao-scoring.js";
 import { fillJogoSelect, setJogosCustomizados } from "./jogos-select.js";
 import { fillSetorSelect } from "./setores.js";
@@ -73,11 +75,13 @@ const els = {
   rankingTable: document.getElementById("ranking-table"),
   rankingModeToggle: document.getElementById("ranking-mode-toggle"),
   pacotinhoSection: document.getElementById("pacotinho-section"),
+  filtroJogo: document.getElementById("filtro-jogo"),
 };
 
 const RANKING_MODE_KEY = "bolao-ranking-mode";
 let sortNewestFirst = true;
 let activeTab = "aberto";
+let activeJogo = "";
 let palpites = [];
 let resultadosMap = new Map();
 let lastLeaderKey = null;
@@ -100,7 +104,25 @@ function showToast(message) {
   els.toast.textContent = message;
   els.toast.classList.add("is-visible");
   clearTimeout(showToast._t);
-  showToast._t = setTimeout(() => els.toast.classList.remove("is-visible"), 3200);
+  showToast._t = setTimeout(() => els.toast.classList.remove("is-visible"), 5000);
+}
+
+function populateJogoFilter() {
+  if (!els.filtroJogo) return;
+  const current = els.filtroJogo.value;
+  const jogosNoPalpite = new Set(palpites.map((p) => p.jogo).filter(Boolean));
+  const ordered = JOGOS_OPCOES.filter((j) => jogosNoPalpite.has(j));
+  jogosNoPalpite.forEach((j) => { if (!ordered.includes(j)) ordered.push(j); });
+
+  els.filtroJogo.innerHTML = '<option value="">Todos os jogos</option>';
+  ordered.forEach((j) => {
+    const opt = document.createElement("option");
+    opt.value = j;
+    opt.textContent = j;
+    els.filtroJogo.appendChild(opt);
+  });
+  els.filtroJogo.value = ordered.includes(current) ? current : "";
+  activeJogo = els.filtroJogo.value;
 }
 
 function setSubmitLoading(loading) {
@@ -445,7 +467,7 @@ function renderRanking() {
   }
 }
 
-function renderCard(p, index) {
+function renderCard(p, index, isDuplicate = false) {
   const gH = Number(p.golsHome);
   const gA = Number(p.golsAway);
   const createdAt = toIsoDate(p.createdAt);
@@ -467,6 +489,14 @@ function renderCard(p, index) {
     ? '<span class="bet-badge bet-badge--late" title="Palpite registrado depois do resultado oficial">⚠ Após o resultado</span>'
     : "";
 
+  const duplicateBadge = isDuplicate
+    ? '<span class="bet-badge bet-badge--duplicate" title="Palpite duplicado — só o primeiro por jogo conta no ranking">⚠ Duplicado</span>'
+    : "";
+
+  const duplicateNotice = isDuplicate
+    ? `<p class="bet-card__duplicate-notice">Este palpite não foi considerado no ranking — <strong>${escapeHtml(p.nome)}</strong> já havia registrado um palpite para este jogo anteriormente.</p>`
+    : "";
+
   let oficialLine = "";
   if (av.oficial) {
     oficialLine = `<p class="bet-card__oficial small mb-2 mb-0">Resultado oficial: <strong>${av.oficial.golsHome} : ${av.oficial.golsAway}</strong></p>`;
@@ -485,6 +515,7 @@ function renderCard(p, index) {
       <div class="d-flex align-items-center gap-2 flex-wrap">
         ${badge}
         ${lateBadge}
+        ${duplicateBadge}
         <time class="bet-card__meta" datetime="${createdAt}">${formatDate(createdAt)}</time>
       </div>
     </div>
@@ -504,6 +535,7 @@ function renderCard(p, index) {
         ? `<div class="reaction-row" aria-label="Reações ao palpite">${renderReactions(p.reactions)}</div>`
         : ""
     }
+    ${duplicateNotice}
   `;
   card.querySelectorAll(".reaction-btn").forEach((btn) => {
     btn.addEventListener("click", () =>
@@ -537,12 +569,15 @@ function renderList() {
 
   els.statTotal.textContent = String(sorted.length);
 
+  populateJogoFilter();
+
   const abertos = sorted.filter((p) => !isEncerrado(p));
   const encerrados = sorted.filter((p) => isEncerrado(p));
   els.countAberto.textContent = String(abertos.length);
   els.countEncerrado.textContent = String(encerrados.length);
 
-  const atual = activeTab === "encerrado" ? encerrados : abertos;
+  let atual = activeTab === "encerrado" ? encerrados : abertos;
+  if (activeJogo) atual = atual.filter((p) => p.jogo === activeJogo);
 
   els.lista.querySelectorAll(".bet-card").forEach((c) => c.remove());
 
@@ -551,7 +586,8 @@ function renderList() {
     els.empty.classList.remove("d-none");
   } else {
     els.empty.classList.add("d-none");
-    atual.forEach((p, i) => els.lista.appendChild(renderCard(p, i)));
+    const duplicateIds = buildDuplicateSet(palpites);
+    atual.forEach((p, i) => els.lista.appendChild(renderCard(p, i, duplicateIds.has(p.id))));
   }
 
   renderRanking();
@@ -625,6 +661,16 @@ els.form.addEventListener("submit", async (e) => {
     return;
   }
 
+  const nomeNorm = els.nome.value.trim().toLowerCase();
+  const jogoVal = els.jogo.value;
+  const jaRegistrou = palpites.some(
+    (p) => (p.nome || "").trim().toLowerCase() === nomeNorm && (p.jogo || "") === jogoVal
+  );
+  if (jaRegistrou) {
+    showToast("Boa tentativa amigão. Mas você já registrou palpite pra este jogo. 🤔 Pede para a Carol editar ou apagar seu registro anterior.");
+    return;
+  }
+
   setSubmitLoading(true);
 
   try {
@@ -670,6 +716,11 @@ els.rankingModeToggle?.addEventListener("change", () => {
   localStorage.setItem(RANKING_MODE_KEY, rankingMode);
   hideRankingPreview();
   renderRanking();
+});
+
+els.filtroJogo?.addEventListener("change", () => {
+  activeJogo = els.filtroJogo.value;
+  renderList();
 });
 
 window.addEventListener("scroll", hideRankingPreview, { passive: true });

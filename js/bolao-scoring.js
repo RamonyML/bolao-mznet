@@ -107,13 +107,48 @@ export function resultadosToMap(docs) {
 }
 
 /**
+ * Returns the earliest palpite per (normalizedNome + jogo) pair.
+ * Used to enforce the "1 palpite per person per game" rule.
+ */
+function getEarliestPerPersonGame(palpites) {
+  const earliest = new Map();
+  palpites.forEach((p) => {
+    const key = `${(p.nome || "").trim().toLowerCase()}||${p.jogo || ""}`;
+    const ms = toMillis(p.createdAt);
+    const prev = earliest.get(key);
+    if (!prev || (ms != null && (prev.ms == null || ms < prev.ms))) {
+      earliest.set(key, { palpite: p, ms });
+    }
+  });
+  return earliest;
+}
+
+/**
+ * Returns a Set of palpite IDs that are duplicates — i.e. not the earliest
+ * bet registered for their (nome + jogo) combination.
+ */
+export function buildDuplicateSet(palpites) {
+  const earliest = getEarliestPerPersonGame(palpites);
+  const firstIds = new Set([...earliest.values()].map((v) => v.palpite.id));
+  const duplicates = new Set();
+  palpites.forEach((p) => {
+    if (p.id && !firstIds.has(p.id)) duplicates.add(p.id);
+  });
+  return duplicates;
+}
+
+/**
  * Ranking por nome (soma de pontos de todos os palpites com resultado definido).
  * Palpites registrados depois do resultado oficial são ignorados (anti-trapaça).
+ * Apenas o primeiro palpite por pessoa/jogo é contabilizado.
  */
 export function buildRanking(palpites, resultadosMap) {
+  const earliest = getEarliestPerPersonGame(palpites);
+  const deduped = [...earliest.values()].map((v) => v.palpite);
+
   const byNome = new Map();
 
-  palpites.forEach((p) => {
+  deduped.forEach((p) => {
     const av = avaliarPalpite(p, resultadosMap);
     if (av.status === "pending") return;
     if (av.registeredAfterResult) return;
