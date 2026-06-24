@@ -13,6 +13,7 @@ import {
 import {
   avaliarPalpite,
   buildRanking,
+  buildSetorRanking,
   buildDuplicateSet,
   medalForRank,
   resultadosToMap,
@@ -78,6 +79,8 @@ const els = {
   rankingModeToggle: document.getElementById("ranking-mode-toggle"),
   pacotinhoSection: document.getElementById("pacotinho-section"),
   filtroJogo: document.getElementById("filtro-jogo"),
+  setorRankingTable: document.getElementById("setor-ranking-table"),
+  setorRankingEmpty: document.getElementById("setor-ranking-empty"),
 };
 
 const RANKING_MODE_KEY = "bolao-ranking-mode";
@@ -436,6 +439,36 @@ function applyRankingMode() {
   }
 }
 
+const SETOR_MEDALS = ["🥇", "🥈", "🥉"];
+
+function renderSetorRanking() {
+  if (!els.setorRankingTable) return;
+  const ranking = buildSetorRanking(palpites, resultadosMap);
+
+  if (ranking.length === 0) {
+    els.setorRankingEmpty.classList.remove("d-none");
+    els.setorRankingTable.innerHTML = "";
+    return;
+  }
+  els.setorRankingEmpty.classList.add("d-none");
+
+  const rows = ranking.map((row, i) => {
+    const medal = SETOR_MEDALS[i] || `${i + 1}º`;
+    const isTop = i < 3;
+    const media = row.media.toFixed(1);
+    return `
+      <div class="setor-row${isTop ? ` setor-row--top${i + 1}` : ""}">
+        <span class="setor-row__pos">${medal}</span>
+        <span class="setor-row__name">${escapeHtml(row.setor)}</span>
+        <span class="setor-row__members">${row.membros} membro${row.membros !== 1 ? "s" : ""}</span>
+        <span class="setor-row__stats">${row.exatos}E · ${row.acertos}A</span>
+        <span class="setor-row__pts" title="${row.pontos} pts total">${media} pts/mb</span>
+      </div>`;
+  }).join("");
+
+  els.setorRankingTable.innerHTML = rows;
+}
+
 function renderRanking() {
   const ranking = buildRanking(palpites, resultadosMap);
   const isTable = rankingMode === "table";
@@ -468,6 +501,8 @@ function renderRanking() {
     lastLeaderKey = leaderKey;
     fireConfetti();
   }
+
+  renderSetorRanking();
 }
 
 function renderCard(p, index, isDuplicate = false) {

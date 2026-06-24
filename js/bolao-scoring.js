@@ -188,6 +188,46 @@ export function buildRanking(palpites, resultadosMap) {
   });
 }
 
+/**
+ * Ranking coletivo por setor (soma dos pontos dos membros de cada área).
+ * Segue as mesmas regras anti-trapaça de buildRanking.
+ */
+export function buildSetorRanking(palpites, resultadosMap) {
+  const earliest = getEarliestPerPersonGame(palpites);
+  const deduped = [...earliest.values()].map((v) => v.palpite);
+
+  const bySetor = new Map();
+
+  deduped.forEach((p) => {
+    const av = avaliarPalpite(p, resultadosMap);
+    if (av.status === "pending") return;
+    if (av.registeredAfterResult) return;
+
+    const setor = (p.setor || "Sem setor").trim();
+    if (!bySetor.has(setor)) {
+      bySetor.set(setor, { setor, pontos: 0, exatos: 0, acertos: 0, membros: new Set() });
+    }
+
+    const row = bySetor.get(setor);
+    row.pontos += av.points;
+    if (av.status === "exact") row.exatos += 1;
+    if (av.status === "exact" || av.status === "result") row.acertos += 1;
+    row.membros.add((p.nome || "").trim().toLowerCase());
+  });
+
+  return [...bySetor.values()]
+    .map((r) => {
+      const membros = r.membros.size;
+      return { ...r, membros, media: membros > 0 ? r.pontos / membros : 0 };
+    })
+    .sort((a, b) => {
+      if (b.media !== a.media) return b.media - a.media;
+      if (b.exatos !== a.exatos) return b.exatos - a.exatos;
+      if (b.acertos !== a.acertos) return b.acertos - a.acertos;
+      return a.setor.localeCompare(b.setor, "pt-BR");
+    });
+}
+
 export function medalForRank(index) {
   if (index === 0) return "🥇";
   if (index === 1) return "🥈";

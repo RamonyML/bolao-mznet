@@ -838,6 +838,28 @@ body.site-page .main-content {
   color: #fff;
 }
 
+/* Ranking por setor */
+.setor-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 0.35rem;
+  background: #f9fafb;
+  font-size: 0.88rem;
+}
+
+.setor-row--top1 { background: #fffbeb; border-left: 3px solid #f59e0b; }
+.setor-row--top2 { background: #f8fafc; border-left: 3px solid #94a3b8; }
+.setor-row--top3 { background: #fdf6f0; border-left: 3px solid #cd7c3a; }
+
+.setor-row__pos  { font-size: 1.1rem; width: 2rem; text-align: center; flex-shrink: 0; }
+.setor-row__name { font-weight: 700; color: #111827; flex: 1; }
+.setor-row__members { font-size: 0.75rem; color: #6b7280; white-space: nowrap; }
+.setor-row__stats { font-size: 0.75rem; color: #6b7280; white-space: nowrap; }
+.setor-row__pts  { font-weight: 700; color: #166635; white-space: nowrap; margin-left: auto; }
+
 .bet-badge--duplicate {
   background: #f97316;
   color: #fff;
