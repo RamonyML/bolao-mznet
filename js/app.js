@@ -52,6 +52,7 @@ const els = {
   tabs: document.querySelectorAll(".bets-tab"),
   countAberto: document.getElementById("count-aberto"),
   countEncerrado: document.getElementById("count-encerrado"),
+  countExatos: document.getElementById("count-exatos"),
   toast: document.getElementById("toast"),
   statTotal: document.getElementById("stat-total"),
   btnSort: document.getElementById("btn-sort"),
@@ -554,6 +555,9 @@ function setEmptyState(tab) {
     els.emptyTitle.textContent = "Nenhum palpite encerrado";
     els.emptyHint.textContent =
       "Os palpites aparecem aqui quando o jogo tiver resultado oficial.";
+  } else if (tab === "exatos") {
+    els.emptyTitle.textContent = "Nenhum placar exato ainda";
+    els.emptyHint.textContent = "Quando alguém acertar o placar exato, aparece aqui.";
   } else {
     els.emptyTitle.textContent = "Nenhum palpite em aberto";
     els.emptyHint.textContent = "Seja o primeiro a registrar o seu.";
@@ -573,10 +577,12 @@ function renderList() {
 
   const abertos = sorted.filter((p) => !isEncerrado(p));
   const encerrados = sorted.filter((p) => isEncerrado(p));
+  const exatos = sorted.filter((p) => avaliarPalpite(p, resultadosMap).status === "exact");
   els.countAberto.textContent = String(abertos.length);
   els.countEncerrado.textContent = String(encerrados.length);
+  els.countExatos.textContent = String(exatos.length);
 
-  let atual = activeTab === "encerrado" ? encerrados : abertos;
+  let atual = activeTab === "exatos" ? exatos : activeTab === "encerrado" ? encerrados : abertos;
   if (activeJogo) atual = atual.filter((p) => p.jogo === activeJogo);
 
   els.lista.querySelectorAll(".bet-card").forEach((c) => c.remove());
