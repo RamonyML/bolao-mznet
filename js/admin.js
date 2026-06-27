@@ -4,6 +4,8 @@ import {
   onSnapshot,
   query,
   orderBy,
+  where,
+  getDocs,
   doc,
   updateDoc,
   deleteDoc,
@@ -588,9 +590,13 @@ function renderJogosList() {
         <span class="resultado-item__placar">Criado pelo admin</span>
       </div>
       <div class="admin-actions">
+        <button type="button" class="btn btn-outline-secondary rounded-pill btn-rename-jogo">Renomear</button>
         <button type="button" class="btn btn-outline-danger rounded-pill btn-delete-jogo">Remover</button>
       </div>
     `;
+    item
+      .querySelector(".btn-rename-jogo")
+      .addEventListener("click", () => renameJogo(jogo));
     item
       .querySelector(".btn-delete-jogo")
       .addEventListener("click", () => removeJogo(jogo));
@@ -661,6 +667,44 @@ async function removeJogo(jogo) {
   } catch (error) {
     console.error(error);
     showToast("Erro ao remover o jogo.");
+  }
+}
+
+async function renameJogo(oldName) {
+  const newName = prompt(`Novo nome para:\n"${oldName}"\n\nOs palpites existentes serão atualizados automaticamente. Timestamps preservados.`);
+  if (!newName || newName.trim() === oldName) return;
+  const trimmed = newName.trim();
+
+  if (getJogosAtuais().includes(trimmed)) {
+    showToast("Já existe um jogo com esse nome.");
+    return;
+  }
+
+  if (!confirm(`Renomear para:\n"${trimmed}"\n\nTodos os palpites com o nome antigo serão atualizados.`)) return;
+
+  try {
+    // Atualiza config/jogos
+    await updateDoc(doc(db, COLLECTION_CONFIG, JOGOS_DOC), {
+      lista: arrayRemove(oldName),
+      updatedAt: serverTimestamp(),
+    });
+    await updateDoc(doc(db, COLLECTION_CONFIG, JOGOS_DOC), {
+      lista: arrayUnion(trimmed),
+      updatedAt: serverTimestamp(),
+    });
+
+    // Migra palpites existentes (preserva createdAt)
+    const snap = await getDocs(query(collection(db, COLLECTION), where("jogo", "==", oldName)));
+    if (!snap.empty) {
+      const batch = writeBatch(db);
+      snap.docs.forEach((d) => batch.update(d.ref, { jogo: trimmed }));
+      await batch.commit();
+    }
+
+    showToast(`Jogo renomeado! ${snap.size} palpite(s) atualizado(s).`);
+  } catch (error) {
+    console.error(error);
+    showToast("Erro ao renomear o jogo.");
   }
 }
 

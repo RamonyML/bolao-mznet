@@ -16,7 +16,7 @@ export function setJogosCustomizados(lista = []) {
   jogosCustomizados = Array.isArray(lista) ? lista.filter(Boolean) : [];
 }
 
-export function fillJogoSelect(selectEl, placeholder = "Selecione o jogo") {
+export function fillJogoSelect(selectEl, placeholder = "Selecione o jogo", { defaultToLast = false } = {}) {
   if (!selectEl) return;
   const current = selectEl.value;
   selectEl.innerHTML = "";
@@ -24,15 +24,22 @@ export function fillJogoSelect(selectEl, placeholder = "Selecione o jogo") {
   const opt0 = document.createElement("option");
   opt0.value = "";
   opt0.disabled = true;
-  opt0.selected = !current;
   opt0.textContent = placeholder;
   selectEl.appendChild(opt0);
 
-  getJogosAtuais().forEach((jogo) => {
+  const jogos = getJogosAtuais();
+  jogos.forEach((jogo) => {
     const opt = document.createElement("option");
     opt.value = jogo;
     opt.textContent = jogo;
-    if (jogo === current) opt.selected = true;
     selectEl.appendChild(opt);
   });
+
+  if (current && jogos.includes(current)) {
+    selectEl.value = current;
+  } else if (defaultToLast && jogos.length > 0) {
+    selectEl.value = jogos[jogos.length - 1];
+  } else {
+    opt0.selected = true;
+  }
 }

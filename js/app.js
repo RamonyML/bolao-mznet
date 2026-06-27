@@ -682,7 +682,8 @@ function subscribeJogos() {
     (snapshot) => {
       const data = snapshot.exists() ? snapshot.data() : {};
       setJogosCustomizados(data.lista || []);
-      fillJogoSelect(els.jogo);
+      fillJogoSelect(els.jogo, undefined, { defaultToLast: true });
+      parseJogoSelect();
     },
     (error) => console.error(error)
   );

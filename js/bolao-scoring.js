@@ -8,10 +8,6 @@ export const JOGOS_OPCOES = [
   "Brasil x Marrocos — 13/06 — Fase de grupos",
   "Brasil x Haiti — 19/06 — Fase de grupos",
   "Escócia x Brasil — 24/06 — Fase de grupos",
-  "Oitavas de final",
-  "Quartas de final",
-  "Semifinal",
-  "Final",
 ];
 
 export function jogoDocId(jogo) {
