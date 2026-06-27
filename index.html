@@ -322,6 +322,21 @@
 
   <div id="toast" role="status" aria-live="polite" class="toast-msg"></div>
 
+  <div id="duplicate-modal" class="dup-modal" aria-hidden="true" role="alertdialog" aria-modal="true">
+    <div class="dup-modal__box">
+      <p class="dup-modal__title">CALMA AÍ, PAIZÃO!</p>
+      <img src="img/no_duplicate.png" alt="" class="dup-modal__img">
+      <p class="dup-modal__msg">
+        Você já registrou palpite pra este jogo. 🤔<br>
+        Pede para a Carol editar ou apagar seu registro anterior.
+      </p>
+      <button type="button" class="dup-modal__close" id="dup-modal-close">Entendi</button>
+      <div class="dup-modal__track">
+        <div class="dup-modal__bar" id="dup-modal-bar"></div>
+      </div>
+    </div>
+  </div>
+
   <div class="card-modal" id="card-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Figurinha do palpiteiro">
     <button type="button" class="card-modal__close" id="card-close" aria-label="Fechar">×</button>
     <div class="player-card" id="player-card">

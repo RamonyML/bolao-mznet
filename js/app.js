@@ -44,6 +44,35 @@ const REACTIONS = [
   { key: "popcorn", emoji: "🍿", label: "Vai pipocar" },
 ];
 
+const dupModal = {
+  el:    document.getElementById("duplicate-modal"),
+  bar:   document.getElementById("dup-modal-bar"),
+  close: document.getElementById("dup-modal-close"),
+  _timer: null,
+};
+
+function showDuplicateModal() {
+  dupModal.el.setAttribute("aria-hidden", "false");
+  dupModal.el.classList.add("is-visible");
+  dupModal.bar.classList.remove("is-running");
+  void dupModal.bar.offsetWidth; // força reflow para reiniciar a animação
+  dupModal.bar.classList.add("is-running");
+  clearTimeout(dupModal._timer);
+  dupModal._timer = setTimeout(closeDuplicateModal, 15000);
+}
+
+function closeDuplicateModal() {
+  clearTimeout(dupModal._timer);
+  dupModal.el.classList.remove("is-visible");
+  dupModal.el.setAttribute("aria-hidden", "true");
+  dupModal.bar.classList.remove("is-running");
+}
+
+dupModal.close?.addEventListener("click", closeDuplicateModal);
+dupModal.el?.addEventListener("click", (e) => {
+  if (e.target === dupModal.el) closeDuplicateModal();
+});
+
 const els = {
   form: document.getElementById("form-palpite"),
   lista: document.getElementById("lista-palpites"),
@@ -718,7 +747,7 @@ els.form.addEventListener("submit", async (e) => {
     (p) => (p.nome || "").trim().toLowerCase() === nomeNorm && (p.jogo || "") === jogoVal
   );
   if (jaRegistrou) {
-    showToast("Boa tentativa amigão. Mas você já registrou palpite pra este jogo. 🤔 Pede para a Carol editar ou apagar seu registro anterior.");
+    showDuplicateModal();
     return;
   }
 

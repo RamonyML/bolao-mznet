@@ -1476,6 +1476,117 @@ body.site-page .main-content {
   color: #4b5563;
 }
 
+/* Modal duplicado */
+.dup-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+.dup-modal.is-visible {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.dup-modal__box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.75rem 1.5rem 1.25rem;
+  max-width: 360px;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  animation: dup-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  word-break: break-word;
+}
+
+@keyframes dup-pop {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.dup-modal__title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #166635;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.dup-modal__img {
+  display: block;
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  margin: 0 auto 1rem;
+}
+
+.dup-modal__msg {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.55;
+  margin-bottom: 1.25rem;
+}
+
+.dup-modal__close {
+  display: inline-block;
+  background: #166635;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 1.75rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: background 0.18s;
+}
+
+.dup-modal__close:hover {
+  background: #0f4a25;
+}
+
+.dup-modal__track {
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.dup-modal__bar {
+  height: 100%;
+  width: 100%;
+  background: #166635;
+  border-radius: 999px;
+  transform-origin: left;
+}
+
+.dup-modal__bar.is-running {
+  animation: dup-progress 15s linear forwards;
+}
+
+@keyframes dup-progress {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+
 /* Toast */
 .toast-msg {
   position: fixed;
